@@ -1,7 +1,6 @@
 const express = require('express');
 const path = require('path');
 const mongoose = require('mongoose');
-const ejsMate = require('ejs-mate');
 const Task = require('./models/task');
 const methodOverride = require('method-override');
 
@@ -16,54 +15,56 @@ mongoose.connect('mongodb://localhost:27017/task-master')
 
 const app = express();
 
-app.engine('ejs', ejsMate);
 app.use(express.urlencoded({ extended: true }));
 app.use(methodOverride('_method'));
-
-app.set('view engine', 'ejs');
-app.set('views', path.join(__dirname, 'views'));
+app.use(express.json());
 
 app.get('/', (req, res) => {
-    res.render('home');
-})
+    res.send('Welcome to the TaskMaster API!');
+});
 
-app.get('/tasks', async (req, res) => {
+// Get all tasks
+app.get('/api/tasks', async (req, res) => {
     const tasks = await Task.find({});
-    res.render('tasks/index', { tasks });
-    console.log('Tasks:', tasks);
+    res.json(tasks);
 }) 
 
-app.get('/tasks/new', (req, res) => {
-    res.render('tasks/new')
+// Create task
+app.post('/api/tasks', async(req, res) => {
+    const task = new Task(req.body);
+    const savedTask = await task.save();
+    console.log('Saved task:', savedTask); // debug line
+    res.status(201).json(savedTask);
 })
 
-app.post('/tasks', async(req, res) => {
-    const task = new Task(req.body.task);
-    await task.save();
-    res.redirect(`/tasks/${task._id}`);
-})
-
-app.get('/tasks/:id', async(req, res) =>{
+// Get one task
+app.get('/api/tasks/:id', async(req, res) =>{
     const task = await Task.findById(req.params.id);
-    res.render('tasks/show', { task });
+    res.json(task);
 })
 
-app.get('/tasks/:id/edit', async(req, res) =>{
-    const task = await Task.findById(req.params.id);
-    res.render('tasks/edit', { task });
+// Update task
+app.put('/api/tasks/:id', async (req, res) => {
+    const task = await Task.findByIdAndUpdate(req.params.id, req.body, { new: true });
+    res.json(task);
+});
+
+// Delete task
+app.delete('/api/tasks/:id', async(req, res) => {
+    await Task.findByIdAndDelete(req.params.id);
+    res.json({ message: 'Task deleted' });
 })
 
-app.put('/tasks/:id', async(req, res) =>{
-    const { id } = req.params;
-    const task = await Task.findByIdAndUpdate(id, {...req.body.task });
-    res.redirect(`/tasks/${task._id}`);
-})
+app.all('*', (req, res) => {
+    res.status(404).json({ error: 'Route not found' });
+});
 
-app.delete('/tasks/:id', async(req, res) => {
-    const { id } = req.params;
-    await Task.findByIdAndDelete(id);
-    res.redirect(`/tasks`);
-})
+console.log('\n📦 Registered Routes:');
+app._router.stack.forEach(r => {
+  if (r.route) {
+    console.log(`${Object.keys(r.route.methods).join(', ').toUpperCase()} ${r.route.path}`);
+  }
+});
 
 app.listen(3000, () => {
     console.log('Serving on port 3000');
