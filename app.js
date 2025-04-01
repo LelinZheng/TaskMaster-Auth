@@ -1,4 +1,5 @@
 require('dotenv').config();
+const requireAuth = require('./middleware/requireAuth');
 const express = require('express');
 const mongoose = require('mongoose');
 const Task = require('./models/task');
@@ -25,18 +26,21 @@ app.get('/', (req, res) => {
     res.send('Welcome to the TaskMaster API!');
 });
 
-// Get all tasks
-app.get('/api/tasks', async (req, res) => {
-    const tasks = await Task.find({});
+// Get all tasks for one user
+app.get('/api/tasks', requireAuth, async (req, res) => {
+    const tasks = await Task.find({ user: req.userId });
     res.json(tasks);
 }) 
 
 // Create task
-app.post('/api/tasks', async(req, res) => {
-    const task = new Task(req.body);
-    const savedTask = await task.save();
-    console.log('Saved task:', savedTask); // debug line
-    res.status(201).json(savedTask);
+app.post('/api/tasks', requireAuth, async(req, res) => {
+    try {
+        const task = new Task({ ...req.body, user: req.userId });
+        await task.save();
+        res.status(201).json(task);
+      } catch (err) {
+        res.status(400).json({ error: err.message });
+      }
 })
 
 // Get one task
@@ -46,14 +50,20 @@ app.get('/api/tasks/:id', async(req, res) =>{
 })
 
 // Update task
-app.put('/api/tasks/:id', async (req, res) => {
-    const task = await Task.findByIdAndUpdate(req.params.id, req.body, { new: true });
-    res.json(task);
+app.put('/api/tasks/:id', requireAuth, async (req, res) => {
+    const task = await Task.findByIdAndUpdate(
+        { _id: req.params.id, user: req.userId },
+        req.body,
+        { new: true }
+    );
+    if (!task) return res.status(404).json({ error: 'Task not found' });
+  res.json(task);
 });
 
 // Delete task
 app.delete('/api/tasks/:id', async(req, res) => {
-    await Task.findByIdAndDelete(req.params.id);
+    const task = await Task.findByIdAndDelete({ _id: req.params.id, user: req.userId });
+    if (!task) return res.status(404).json({ error: 'Task not found' });
     res.json({ message: 'Task deleted' });
 })
 
