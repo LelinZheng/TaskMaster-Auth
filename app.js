@@ -1,8 +1,10 @@
+require('dotenv').config();
 const express = require('express');
-const path = require('path');
 const mongoose = require('mongoose');
 const Task = require('./models/task');
 const methodOverride = require('method-override');
+const jwt = require('jsonwebtoken');
+const User = require('./models/user');
 
 
 mongoose.connect('mongodb://localhost:27017/task-master')
@@ -54,6 +56,38 @@ app.delete('/api/tasks/:id', async(req, res) => {
     await Task.findByIdAndDelete(req.params.id);
     res.json({ message: 'Task deleted' });
 })
+
+app.post('/api/register', async (req, res) => {
+    try {
+      const { username, email, password } = req.body;
+      const existing = await User.findOne({ email });
+      if (existing) return res.status(400).json({ error: 'Email already in use' });
+  
+      const user = new User({ username, email, password });
+      await user.save();
+  
+      const token = jwt.sign({ id: user._id }, process.env.JWT_SECRET);
+      res.status(201).json({ token });
+    } catch (err) {
+      res.status(500).json({ error: err.message });
+    }
+});
+  
+app.post('/api/login', async (req, res) => {
+try {
+    const { email, password } = req.body;
+    const user = await User.findOne({ email });
+    if (!user) return res.status(400).json({ error: 'Invalid credentials' });
+
+    const match = await user.comparePassword(password);
+    if (!match) return res.status(400).json({ error: 'Invalid credentials' });
+
+    const token = jwt.sign({ id: user._id }, process.env.JWT_SECRET);
+    res.json({ token });
+} catch (err) {
+    res.status(500).json({ error: err.message });
+}
+});
 
 app.all('*', (req, res) => {
     res.status(404).json({ error: 'Route not found' });
