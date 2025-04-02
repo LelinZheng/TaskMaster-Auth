@@ -71,17 +71,22 @@ app.delete('/api/tasks/:id', async(req, res) => {
 
 app.post('/api/register', async (req, res) => {
     try {
-      const { username, email, password } = req.body;
-      const existing = await User.findOne({ email });
-      if (existing) return res.status(400).json({ error: 'Email already in use' });
-  
-      const user = new User({ username, email, password });
-      await user.save();
-  
-      const token = jwt.sign({ id: user._id }, process.env.JWT_SECRET);
-      res.status(201).json({ token });
+        const { username, email, password } = req.body;
+    
+        const user = new User({ username, email, password });
+        await user.save();
+    
+        const token = jwt.sign({ id: user._id }, process.env.JWT_SECRET);
+        res.status(201).json({ token });
+    
     } catch (err) {
-      res.status(500).json({ error: err.message });
+        if (err.code === 11000) {
+          const field = Object.keys(err.keyValue)[0];
+          const value = err.keyValue[field];
+          return res.status(400).json({ error: `${field.charAt(0).toUpperCase() + field.slice(1)} "${value}" is already taken.` });
+        }
+        
+        res.status(500).json({ error: err.message });
     }
 });
   
