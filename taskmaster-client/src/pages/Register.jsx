@@ -2,6 +2,7 @@ import { useState, useContext } from 'react';
 import axios from 'axios';
 import { AuthContext } from '../context/AuthContext';
 import { useNavigate } from 'react-router-dom';
+import Layout from '../components/Layout';
 
 function Register(){
     const { login } = useContext(AuthContext);
@@ -29,7 +30,7 @@ function Register(){
     };
 
     return (
-        <div>
+        <Layout>
             <h2>Register</h2>
             {error && <p style={{ color: 'red' }}>{error}</p>}
             <form onSubmit={handleSubmit}>
@@ -41,7 +42,7 @@ function Register(){
                 <br />
                 <button type="submit">Register</button>
             </form>
-        </div>
+            </Layout>
     );
 }
 

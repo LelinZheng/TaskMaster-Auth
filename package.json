@@ -19,6 +19,7 @@
   "homepage": "https://github.com/LelinZheng/TaskMaster-Auth#readme",
   "dependencies": {
     "bcryptjs": "^3.0.2",
+    "bootstrap": "^5.3.3",
     "cors": "^2.8.5",
     "dotenv": "^16.4.7",
     "express": "^4.18.2",

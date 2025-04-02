@@ -2,16 +2,11 @@ import { BrowserRouter as Router, Routes, Route, Link } from 'react-router-dom';
 import Login from './pages/Login';
 import Register from './pages/Register';
 import Dashboard from './pages/Dashboard';
+import 'bootstrap/dist/css/bootstrap.min.css';
 
 function App() {
   return (
     <Router>
-      <nav>
-        <Link to="/">Home</Link> |{' '}
-        <Link to="/login">Login</Link> |{' '}
-        <Link to="/register">Register</Link>
-      </nav>
-
       <Routes>
         <Route path="/" element={<h1>Welcome to Task Master</h1>} />
         <Route path="/login" element={<Login />} />
