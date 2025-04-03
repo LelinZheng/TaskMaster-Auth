@@ -8,35 +8,66 @@ function TaskList({ tasks, onEdit, onDelete, editingTaskId, deletingTaskId}) {
         </div>
       );
     }
+    const getPriorityClass = (priority) => {
+        switch (priority) {
+            case 'High':
+            return 'bg-danger';
+            case 'Medium':
+            return 'bg-info';
+            case 'Low':
+            default:
+            return 'bg-info';
+        }
+        };
+        
+        const getStatusClass = (status) => {
+        switch (status) {
+            case 'Pending':
+            return 'bg-dark';
+            case 'In Progress':
+            return 'bg-primary';
+            case 'Completed':
+            return 'bg-success';
+            default:
+            return 'bg-dark';
+        }
+    };
   
     return (
       <ul className="list-group">
         {tasks.map((task) => (
           <li className="list-group-item" key={task._id}>
-             <div className="d-flex flex-column flex-md-row justify-content-between align-items-start align-items-md-center gap-2">
+             <div className="d-flex justify-content-between align-items-center flex-wrap">
                 <div>
-                    <strong>{task.title}</strong> — <span className="badge bg-secondary">{task.status}</span>
+                    <strong>{task.title}</strong> 
                 </div>
                 <div>
-                    {editingTaskId !== task._id && (
-                        <button className="btn btn-sm btn-warning me-2" onClick={() => onEdit(task)}>Edit</button>
-                    )}
-                    <button
-                        className="btn btn-danger btn-sm"
-                        disabled={deletingTaskId === task._id}
-                        onClick={() => onDelete(task._id)}
-                    >
-                        {deletingTaskId === task._id ? (
-                            <span className="spinner-border spinner-border-sm" role="status" />
-                        ) : (
-                            'Delete'
-                        )}
-                    </button>
+                    <span className={`badge ${getStatusClass(task.status)}`}>{task.status}</span>
                 </div>
             </div>
-            <div className="mt-2">
-                <span className="badge bg-success me-2">Priority: {task.priority}</span>
-                {task.description}
+            <div className="d-flex justify-content-between flex-wrap">
+                <div className="flex-grow-1 me-2 text-break">
+                    {task.description}
+                </div>
+                <div className="text-end">
+                    <span className={`badge ${getPriorityClass(task.priority)}`}>Priority: {task.priority}</span>
+                </div>
+            </div>
+            <div className="mt-3 d-flex gap-2 flex-wrap">
+                {editingTaskId !== task._id && (
+                    <button className="btn btn-sm btn-warning me-2" onClick={() => onEdit(task)}>Edit</button>
+                )}
+                <button
+                    className="btn btn-danger btn-sm"
+                    disabled={deletingTaskId === task._id}
+                    onClick={() => onDelete(task._id)}
+                >
+                    {deletingTaskId === task._id ? (
+                        <span className="spinner-border spinner-border-sm" role="status" />
+                    ) : (
+                        'Delete'
+                    )}
+                </button>
             </div>
           </li>
         ))}
