@@ -76,22 +76,23 @@ function Dashboard() {
   
     return (
         <Layout>
-            <div className="row">
-                <div className="col-6 offset-3">
-                    <div className="mb-3">
-                            {/* Edit Task Section */}
-                            {editingTask && (
-                                <div className="card shadow-sm p-4 mb-4 border bg-light-subtle">
-                                <h5 className="text-center text-main mb-3">Editing Task: {editingTask.title}</h5>
-                                <TaskForm
-                                    token={token}
-                                    editingTask={editingTask}
-                                    onCreate={() => {}}
-                                    onUpdate={handleUpdate}
-                                    cancelEdit={() => setEditingTask(null)}
-                                />
-                                </div>
-                            )}
+            <div className="container">
+                <div className="row justify-content-center">
+                    {/* Size will adapt on different screen (mobile/laptop/pad)*/}
+                    <div className="col-12 col-md-10 col-lg-8">
+                        {/* Edit Task Section */}
+                        {editingTask && (
+                            <div className="card shadow-sm p-4 mb-4 border bg-light-subtle">
+                            <h5 className="text-center text-main mb-3">Editing Task: {editingTask.title}</h5>
+                            <TaskForm
+                                token={token}
+                                editingTask={editingTask}
+                                onCreate={() => {}}
+                                onUpdate={handleUpdate}
+                                cancelEdit={() => setEditingTask(null)}
+                            />
+                            </div>
+                        )}
                         {/* Task List */}
                         <h2 className="card-title mb-3">Your Tasks</h2>
                         <div>
@@ -103,7 +104,7 @@ function Dashboard() {
                                     editingTaskId={editingTask?._id} 
                                     deletingTaskId={deletingTaskId}
                                 />
-                            }
+                            }     
                         </div>
                     </div>
                 </div>

@@ -12,8 +12,8 @@ function TaskList({ tasks, onEdit, onDelete, editingTaskId, deletingTaskId}) {
     return (
       <ul className="list-group">
         {tasks.map((task) => (
-          <li className="list-group-item">
-             <div className="w-100 d-flex justify-content-between align-items-center">
+          <li className="list-group-item" key={task._id}>
+             <div className="d-flex flex-column flex-md-row justify-content-between align-items-start align-items-md-center gap-2">
                 <div>
                     <strong>{task.title}</strong> — <span className="badge bg-secondary">{task.status}</span>
                 </div>

@@ -22,9 +22,9 @@ function AddTask() {
 
   return (
     <Layout>
-        <div className="row">
-            <div className="col-6 offset-3">
-                <div className="mb-3">
+        <div className="container">
+            <div className="row justify-content-center">
+                <div className="col-12 col-md-10 col-lg-8"> 
                     <h2>Create New Task</h2>
                     <TaskForm
                         token={token}

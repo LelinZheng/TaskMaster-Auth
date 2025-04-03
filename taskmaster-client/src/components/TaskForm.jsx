@@ -79,7 +79,7 @@ function TaskForm({ token, onCreate, onUpdate, editingTask, cancelEdit }) {
                     onChange={handleChange}
                     placeholder="Description"
                 />
-                <label className="form-label badge bg-success me-2" for="priority">Priority</label>
+                <label className="form-label badge bg-success me-2" htmlFor="priority">Priority</label>
                 <select
                     className="form-select mb-2"
                     name="priority"
@@ -90,7 +90,7 @@ function TaskForm({ token, onCreate, onUpdate, editingTask, cancelEdit }) {
                     <option>Medium</option>
                     <option>High</option>
                 </select>
-                <label className="form-label badge bg-secondary" for="status">Task Status</label>
+                <label className="form-label badge bg-secondary" htmlFor="status">Task Status</label>
                 <select
                     className="form-select mb-2"
                     name="status"
