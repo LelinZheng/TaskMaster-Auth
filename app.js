@@ -41,7 +41,13 @@ app.post('/api/tasks', requireAuth, async(req, res) => {
         await task.save();
         res.status(201).json(task);
       } catch (err) {
-        res.status(400).json({ error: err.message });
+        if (err.name === 'ValidationError') {
+            const errors = Object.fromEntries(
+                Object.entries(err.errors).map(([field, val]) => [field, val.message])
+            );
+            return res.status(400).json({ errors });
+        }
+        res.status(500).json({ error: 'Server error while creating task' });
       }
 })
 
@@ -85,7 +91,7 @@ app.post('/api/register', async (req, res) => {
           const value = err.keyValue[field];
           return res.status(400).json({ error: `${field.charAt(0).toUpperCase() + field.slice(1)} "${value}" is already taken.` });
         }
-        
+
         res.status(500).json({ error: err.message });
     }
 });
