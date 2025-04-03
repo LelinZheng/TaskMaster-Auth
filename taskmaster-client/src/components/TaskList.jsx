@@ -1,6 +1,6 @@
 import { Link } from 'react-router-dom';
 
-function TaskList({ tasks, onEdit, onDelete, editingTaskId }) {
+function TaskList({ tasks, onEdit, onDelete, editingTaskId, deletingTaskId}) {
     if (tasks.length === 0) {
       return (
         <div className="text-center mt-4">
@@ -21,7 +21,17 @@ function TaskList({ tasks, onEdit, onDelete, editingTaskId }) {
                     {editingTaskId !== task._id && (
                         <button className="btn btn-sm btn-warning me-2" onClick={() => onEdit(task)}>Edit</button>
                     )}
-                    <button className="btn btn-sm btn-danger" onClick={() => onDelete(task._id)}>Delete</button>
+                    <button
+                        className="btn btn-danger btn-sm"
+                        disabled={deletingTaskId === task._id}
+                        onClick={() => onDelete(task._id)}
+                    >
+                        {deletingTaskId === task._id ? (
+                            <span className="spinner-border spinner-border-sm" role="status" />
+                        ) : (
+                            'Delete'
+                        )}
+                    </button>
                 </div>
             </div>
             <div className="mt-2">

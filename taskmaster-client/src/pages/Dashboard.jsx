@@ -5,24 +5,26 @@ import { useNavigate } from 'react-router-dom';
 import Layout from '../components/Layout';
 import TaskForm from '../components/TaskForm';
 import TaskList from '../components/TaskList';
+import Spinner from '../components/Spinner';
 
 function Dashboard() {
     const { token, isLoggedIn } = useContext(AuthContext);
-    const { logout } = useContext(AuthContext);
     const navigate = useNavigate();
     const [tasks, setTasks] = useState([]);
     const [error, setError] = useState('');
     const [loading, setLoading] = useState(true);
     const [editingTask, setEditingTask] = useState(null);
+    const [deletingTaskId, setDeletingTaskId] = useState(null);
     
-  
+
     useEffect(() => {
-      if (!isLoggedIn) {
+      if (!isLoggedIn) { // This check protects that route by redirecting to /login
         navigate('/login');
         return;
       }
   
       const fetchTasks = async () => {
+        setLoading(true);
         try {
           const res = await axios.get('http://localhost:3000/api/tasks', {
             headers: {
@@ -40,26 +42,18 @@ function Dashboard() {
       fetchTasks();
     }, [token, isLoggedIn, navigate]);
 
-    const handleCreate = async (taskData) => {
-        try {
-          const res = await axios.post('http://localhost:3000/api/tasks', taskData, {
-            headers: {Authorization: `Bearer ${token}`},
-          });
-          setTasks([...tasks, res.data]);
-        } catch (err) {
-          setError('Failed to create task');
-        }
-      };
-
     const handleDelete = async (taskId) => {
-    try {
-        await axios.delete(`http://localhost:3000/api/tasks/${taskId}`, {
-        headers: { Authorization: `Bearer ${token}` },
-        });
-        setTasks(tasks.filter(task => task._id !== taskId));
-    } catch (err) {
-        setError('Failed to delete task');
-    }
+        setDeletingTaskId(taskId);
+        try {
+            await axios.delete(`http://localhost:3000/api/tasks/${taskId}`, {
+            headers: { Authorization: `Bearer ${token}` },
+            });
+            setTasks(tasks.filter(task => task._id !== taskId));
+        } catch (err) {
+            setError('Failed to delete task');
+        } finally {
+            setDeletingTaskId(null);
+        }
     };
 
     const handleEdit = (task) => {
@@ -77,13 +71,7 @@ function Dashboard() {
             setError('Failed to update task');
         }
     };
-
-    const handleLogout = () => {
-        logout();
-        navigate('/login');
-    };
   
-    if (loading) return <Layout><p>Loading your tasks...</p></Layout>;
     if (error) return <Layout><p style={{ color: 'red' }}>{error}</p></Layout>;
   
     return (
@@ -94,7 +82,7 @@ function Dashboard() {
                             {/* Edit Task Section */}
                             {editingTask && (
                                 <div className="card shadow-sm p-4 mb-4 border bg-light-subtle">
-                                <h5 className="text-center text-primary mb-3">Editing Task: {editingTask.title}</h5>
+                                <h5 className="text-center text-main mb-3">Editing Task: {editingTask.title}</h5>
                                 <TaskForm
                                     token={token}
                                     editingTask={editingTask}
@@ -105,8 +93,18 @@ function Dashboard() {
                                 </div>
                             )}
                         {/* Task List */}
-                        <h2 className="card-title">Your Tasks</h2>
-                        <TaskList tasks={tasks} onEdit={handleEdit} onDelete={handleDelete} editingTaskId={editingTask?._id}/>
+                        <h2 className="card-title mb-3">Your Tasks</h2>
+                        <div>
+                            {loading ? <Spinner />: 
+                                <TaskList 
+                                    tasks={tasks} 
+                                    onEdit={handleEdit} 
+                                    onDelete={handleDelete} 
+                                    editingTaskId={editingTask?._id} 
+                                    deletingTaskId={deletingTaskId}
+                                />
+                            }
+                        </div>
                     </div>
                 </div>
             </div>

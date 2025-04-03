@@ -18,10 +18,8 @@ function Login() {
         e.preventDefault();
         try{
             const res = await axios.post('http://localhost:3000/api/login', form);
-            console.log("Login successful, token:", res.data.token);
             login(res.data.token);
             navigate('/dashboard');
-            console.log("Navigating to dashboard...");
         }catch(err){
             setError(err.response?.data?.error || 'Login failed');
         }

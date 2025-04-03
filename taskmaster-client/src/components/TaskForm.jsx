@@ -7,6 +7,8 @@ function TaskForm({ token, onCreate, onUpdate, editingTask, cancelEdit }) {
     priority: 'Medium',
     status: 'Pending',
   });
+  const [submitting, setSubmitting] = useState(false);
+
 
   useEffect(() => {
     if (editingTask) {
@@ -25,12 +27,19 @@ function TaskForm({ token, onCreate, onUpdate, editingTask, cancelEdit }) {
     setTaskData({ ...taskData, [e.target.name]: e.target.value });
   };
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async(e) => {
     e.preventDefault();
-    if (editingTask) {
-      onUpdate(taskData);
-    } else {
-      onCreate(taskData);
+    setSubmitting(true);
+    try {
+        if (editingTask) {
+            await onUpdate(taskData);
+          } else {
+            await onCreate(taskData);
+          }
+        } catch (err) {
+          console.error('Task submission failed:', err);
+    } finally {
+        setSubmitting(false);
     }
   };
 
@@ -53,7 +62,7 @@ function TaskForm({ token, onCreate, onUpdate, editingTask, cancelEdit }) {
                 onChange={handleChange}
                 placeholder="Description"
             />
-            <label class="form-label badge bg-success me-2" for="priority">Priority</label>
+            <label className="form-label badge bg-success me-2" for="priority">Priority</label>
             <select
                 className="form-select mb-2"
                 name="priority"
@@ -64,7 +73,7 @@ function TaskForm({ token, onCreate, onUpdate, editingTask, cancelEdit }) {
                 <option>Medium</option>
                 <option>High</option>
             </select>
-            <label class="form-label badge bg-secondary" for="status">Task Status</label>
+            <label className="form-label badge bg-secondary" for="status">Task Status</label>
             <select
                 className="form-select mb-2"
                 name="status"
@@ -75,8 +84,15 @@ function TaskForm({ token, onCreate, onUpdate, editingTask, cancelEdit }) {
                 <option>In Progress</option>
                 <option>Completed</option>
             </select>
-            <button type="submit" className="btn btn-primary">
-                {editingTask ? 'Update Task' : 'Add Task'}
+            <button className="btn btn-primary" disabled={submitting}>
+            {submitting ? (
+                <>
+                    <span className="spinner-border spinner-border-sm me-2" role="status" />
+                    {editingTask ? 'Updating...' : 'Adding...'}
+                </>
+            ) : (
+                editingTask ? 'Update Task' : 'Add Task'
+            )}
             </button>
             {editingTask && (
                 <button type="button" className="btn btn-secondary ms-2" onClick={cancelEdit}>
