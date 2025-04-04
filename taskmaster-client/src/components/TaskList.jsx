@@ -15,6 +15,7 @@ function TaskList({ tasks, onEdit, onDelete, editingTaskId, deletingTaskId}) {
             case 'Medium':
             return 'bg-info';
             case 'Low':
+            return 'bg-secondary';
             default:
             return 'bg-info';
         }
@@ -23,13 +24,13 @@ function TaskList({ tasks, onEdit, onDelete, editingTaskId, deletingTaskId}) {
         const getStatusClass = (status) => {
         switch (status) {
             case 'Pending':
-            return 'bg-dark';
+            return 'bg-secondary';
             case 'In Progress':
-            return 'bg-primary';
+            return 'bg-warning';
             case 'Completed':
             return 'bg-success';
             default:
-            return 'bg-dark';
+            return 'bg-secondary';
         }
     };
   

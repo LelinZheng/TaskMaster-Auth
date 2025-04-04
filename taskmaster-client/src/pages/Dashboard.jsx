@@ -15,6 +15,8 @@ function Dashboard() {
     const [loading, setLoading] = useState(true);
     const [editingTask, setEditingTask] = useState(null);
     const [deletingTaskId, setDeletingTaskId] = useState(null);
+    const [searchTerm, setSearchTerm] = useState('');
+    const [sortBy, setSortBy] = useState('createdAt');
     
 
     useEffect(() => {
@@ -26,16 +28,17 @@ function Dashboard() {
       const fetchTasks = async () => {
         setLoading(true);
         try {
-          const res = await axios.get('http://localhost:3000/api/tasks', {
-            headers: {
-              Authorization: `Bearer ${token}`,
-            },
-          });
-          setTasks(res.data);
+            const res = await axios.get('http://localhost:3000/api/tasks', {
+                headers: {
+                Authorization: `Bearer ${token}`,
+                },
+            });
+            setTasks(res.data);
         } catch (err) {
-          setError('Failed to load tasks');
+            console.error('Fetch error:', err);
+            setError('Failed to load tasks');
         } finally {
-          setLoading(false);
+            setLoading(false);
         }
       };
   
@@ -71,6 +74,23 @@ function Dashboard() {
             setError('Failed to update task');
         }
     };
+
+    const filteredTasks = tasks.filter(task =>
+        task.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
+        task.description.toLowerCase().includes(searchTerm.toLowerCase())
+    );
+    
+    const sortedTasks = [...filteredTasks].sort((a, b) => {
+        if (sortBy === 'priority') {
+          const order = { High: 1, Medium: 2, Low: 3 };
+          return order[a.priority] - order[b.priority];
+        } else if (sortBy === 'status') {
+          const order = { Pending: 1, 'In Progress': 2, Completed: 3 };
+          return order[a.status] - order[b.status];
+        } else {
+          return new Date(a.createdAt) - new Date(b.createdAt);
+        }
+    });
   
     if (error) return <Layout><p style={{ color: 'red' }}>{error}</p></Layout>;
   
@@ -79,7 +99,15 @@ function Dashboard() {
             <div className="container">
                 <div className="row justify-content-center">
                     {/* Size will adapt on different screen (mobile/laptop/pad)*/}
+                    
                     <div className="col-12 col-md-10 col-lg-8">
+                        <input
+                            type="text"
+                            className="form-control mb-3"
+                            placeholder="Search tasks..."
+                            value={searchTerm}
+                            onChange={(e) => setSearchTerm(e.target.value)}
+                        />
                         {/* Edit Task Section */}
                         {editingTask && (
                             <div className="card shadow-sm p-4 mb-4 border bg-light-subtle">
@@ -94,11 +122,25 @@ function Dashboard() {
                             </div>
                         )}
                         {/* Task List */}
-                        <h2 className="card-title mb-3">Your Tasks</h2>
+                        <div className="d-flex justify-content-between align-items-center mb-3 flex-wrap">
+                            <h2 className="mb-0">Your Tasks</h2>
+                            <div className="d-flex align-items-center gap-2">
+                                <label htmlFor="sort" className="form-label mb-0 me-1 text-nowrap">Sort by:</label>
+                                <select
+                                    className="form-select mb-3"
+                                    value={sortBy}
+                                    onChange={(e) => setSortBy(e.target.value)}
+                                >
+                                    <option value="createdAt">Time Added</option>
+                                    <option value="priority">Priority</option>
+                                    <option value="status">Status</option>
+                                </select>
+                            </div>
+                        </div>
                         <div>
                             {loading ? <Spinner />: 
                                 <TaskList 
-                                    tasks={tasks} 
+                                    tasks={sortedTasks}
                                     onEdit={handleEdit} 
                                     onDelete={handleDelete} 
                                     editingTaskId={editingTask?._id} 
