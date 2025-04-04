@@ -1,5 +1,5 @@
 require('dotenv').config();
-const cors = require('cors');
+const allowedOrigins = ['https://task-master-auth.vercel.app'];
 const requireAuth = require('./middleware/requireAuth');
 const express = require('express');
 const mongoose = require('mongoose');
@@ -9,6 +9,10 @@ const jwt = require('jsonwebtoken');
 const User = require('./models/user');
 const PORT = process.env.PORT || 3000;
 
+app.use(cors({
+    origin: allowedOrigins,
+    credentials: true,
+  }));
 
 if (process.env.NODE_ENV !== 'test') {
     mongoose.connect(process.env.MONGO_URI, {
