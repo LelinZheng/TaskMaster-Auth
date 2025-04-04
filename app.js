@@ -25,7 +25,8 @@ const corsOptions = {
   methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
   credentials: true,
 };
-
+// dummy reploy trigger
+console.log("dummy reploy trigger");
 app.use(cors(corsOptions));
 app.options('*', cors(corsOptions));
 
