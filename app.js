@@ -1,14 +1,17 @@
 require('dotenv').config();
-const allowedOrigins = ['https://task-master-auth.vercel.app'];
-const requireAuth = require('./middleware/requireAuth');
+const cors = require('cors');
 const express = require('express');
+const requireAuth = require('./middleware/requireAuth');
 const mongoose = require('mongoose');
-const Task = require('./models/task');
 const methodOverride = require('method-override');
 const jwt = require('jsonwebtoken');
+const Task = require('./models/task');
 const User = require('./models/user');
 const PORT = process.env.PORT || 3000;
 
+const app = express();
+
+const allowedOrigins = ['https://task-master-auth.vercel.app'];
 app.use(cors({
     origin: allowedOrigins,
     credentials: true,
@@ -23,12 +26,10 @@ if (process.env.NODE_ENV !== 'test') {
     .catch((err) => console.error('Connection error:', err));
   }
 
-const app = express();
 
 app.use(express.urlencoded({ extended: true }));
 app.use(methodOverride('_method'));
 app.use(express.json());
-app.use(cors());
 
 app.get('/', (req, res) => {
     res.send('Welcome to the TaskMaster API!');
