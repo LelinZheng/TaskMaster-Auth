@@ -9,13 +9,13 @@ const jwt = require('jsonwebtoken');
 const User = require('./models/user');
 
 
-mongoose.connect('mongodb://localhost:27017/task-master')
-    .then(() => {
-        console.log("MongoDB connected!");
-    })
-    .catch(err => {
-        console.error("Connection error:", err);
-    });
+// Only connect if not in test mode
+if (process.env.NODE_ENV !== 'test') {
+  console.log("-------------------------haha-----------------------")
+    mongoose.connect('mongodb://localhost:27017/task-master')
+      .then(() => console.log('MongoDB connected!'))
+      .catch((err) => console.error('Connection error:', err));
+}
 
 const app = express();
 
@@ -59,20 +59,23 @@ app.get('/api/tasks/:id', async(req, res) =>{
 
 // Update task
 app.put('/api/tasks/:id', requireAuth, async (req, res) => {
-    const task = await Task.findByIdAndUpdate(
+
+    const task = await Task.findOneAndUpdate(
         { _id: req.params.id, user: req.userId },
         req.body,
         { new: true }
     );
+
     if (!task) return res.status(404).json({ error: 'Task not found' });
-  res.json(task);
+    res.json(task);
 });
 
 // Delete task
-app.delete('/api/tasks/:id', async(req, res) => {
-    const task = await Task.findByIdAndDelete({ _id: req.params.id, user: req.userId });
+app.delete('/api/tasks/:id', requireAuth, async(req, res) => {
+    const task = await Task.findOneAndDelete({ _id: req.params.id, user: req.userId });
+
     if (!task) return res.status(404).json({ error: 'Task not found' });
-    res.json({ message: 'Task deleted' });
+        res.json({ message: 'Task deleted' });
 })
 
 app.post('/api/register', async (req, res) => {
@@ -97,32 +100,36 @@ app.post('/api/register', async (req, res) => {
 });
   
 app.post('/api/login', async (req, res) => {
-try {
-    const { email, password } = req.body;
-    const user = await User.findOne({ email });
-    if (!user) return res.status(400).json({ error: 'Invalid credentials' });
+    try {
+        const { email, password } = req.body;
+        const user = await User.findOne({ email });
+        if (!user) return res.status(400).json({ error: 'Invalid credentials' });
 
-    const match = await user.comparePassword(password);
-    if (!match) return res.status(400).json({ error: 'Invalid credentials' });
+        const match = await user.comparePassword(password);
+        if (!match) return res.status(400).json({ error: 'Invalid credentials' });
 
-    const token = jwt.sign({ id: user._id }, process.env.JWT_SECRET);
-    res.json({ token });
-} catch (err) {
-    res.status(500).json({ error: err.message });
-}
+        const token = jwt.sign({ id: user._id }, process.env.JWT_SECRET);
+        res.json({ token });
+    } catch (err) {
+        res.status(500).json({ error: err.message });
+    }
 });
 
 app.all('*', (req, res) => {
     res.status(404).json({ error: 'Route not found' });
 });
 
-console.log('\n📦 Registered Routes:');
+console.log('\n Registered Routes:');
 app._router.stack.forEach(r => {
   if (r.route) {
     console.log(`${Object.keys(r.route.methods).join(', ').toUpperCase()} ${r.route.path}`);
   }
 });
 
+
 app.listen(3000, () => {
     console.log('Serving on port 3000');
-})
+});
+
+  
+module.exports = app;
