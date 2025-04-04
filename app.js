@@ -7,15 +7,17 @@ const Task = require('./models/task');
 const methodOverride = require('method-override');
 const jwt = require('jsonwebtoken');
 const User = require('./models/user');
+const PORT = process.env.PORT || 3000;
 
 
-// Only connect if not in test mode
 if (process.env.NODE_ENV !== 'test') {
-  console.log("-------------------------haha-----------------------")
-    mongoose.connect('mongodb://localhost:27017/task-master')
-      .then(() => console.log('MongoDB connected!'))
-      .catch((err) => console.error('Connection error:', err));
-}
+    mongoose.connect(process.env.MONGO_URI, {
+      useNewUrlParser: true,
+      useUnifiedTopology: true
+    })
+    .then(() => console.log('MongoDB connected!'))
+    .catch((err) => console.error('Connection error:', err));
+  }
 
 const app = express();
 
@@ -127,8 +129,8 @@ app._router.stack.forEach(r => {
 });
 
 
-app.listen(3000, () => {
-    console.log('Serving on port 3000');
+app.listen(PORT, () => {
+    console.log(`Serving on port ${PORT}`);
 });
 
   
