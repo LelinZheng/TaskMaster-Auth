@@ -29,6 +29,11 @@ const corsOptions = {
 app.use(cors(corsOptions));
 app.options('*', cors(corsOptions));
 
+app.get('/cors-check', (req, res) => {
+    res.set('Access-Control-Allow-Origin', '*');
+    res.json({ message: 'CORS check route reached!' });
+  });
+
 if (process.env.NODE_ENV !== 'test') {
     mongoose.connect(process.env.MONGO_URI, {
       useNewUrlParser: true,
