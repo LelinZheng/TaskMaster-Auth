@@ -17,6 +17,7 @@ function Dashboard() {
     const [deletingTaskId, setDeletingTaskId] = useState(null);
     const [searchTerm, setSearchTerm] = useState('');
     const [sortBy, setSortBy] = useState('createdAt');
+    const baseUrl = process.env.REACT_APP_API_BASE_URL;
     
 
     useEffect(() => {
@@ -28,7 +29,7 @@ function Dashboard() {
       const fetchTasks = async () => {
         setLoading(true);
         try {
-            const res = await axios.get('http://localhost:3000/api/tasks', {
+            const res = await axios.get(`${baseUrl}/api/tasks`, {
                 headers: {
                 Authorization: `Bearer ${token}`,
                 },
@@ -43,12 +44,12 @@ function Dashboard() {
       };
   
       fetchTasks();
-    }, [token, isLoggedIn, navigate]);
+    }, [baseUrl]);
 
     const handleDelete = async (taskId) => {
         setDeletingTaskId(taskId);
         try {
-            await axios.delete(`http://localhost:3000/api/tasks/${taskId}`, {
+            await axios.delete(`${baseUrl}/api/tasks/${taskId}`, {
             headers: { Authorization: `Bearer ${token}` },
             });
             setTasks(tasks.filter(task => task._id !== taskId));
@@ -65,7 +66,7 @@ function Dashboard() {
       
     const handleUpdate = async (taskData) => {
         try {
-            const res = await axios.put(`http://localhost:3000/api/tasks/${editingTask._id}`, taskData, {
+            const res = await axios.put(`${baseUrl}/api/tasks/${editingTask._id}`, taskData, {
             headers: { Authorization: `Bearer ${token}` },
             });
             setTasks(tasks.map(task => task._id === res.data._id ? res.data : task));

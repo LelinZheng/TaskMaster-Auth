@@ -9,6 +9,7 @@ function Register(){
     const navigate = useNavigate();
     const [form, setform] = useState({username: '', email: '', password: ''});
     const [error, setError] = useState('');
+    const baseUrl = process.env.REACT_APP_API_BASE_URL;
 
     const handleChange = (e) =>{
         setform({ ...form, [e.target.name]: e.target.value });
@@ -17,7 +18,7 @@ function Register(){
     const handleSubmit = async (e) => {
         e.preventDefault();
         try{
-            const res = await axios.post('http://localhost:3000/api/register', form);
+            const res = await axios.post(`${baseUrl}/api/register`, form);
             login(res.data.token);
             navigate('/dashboard');
         }catch(err){

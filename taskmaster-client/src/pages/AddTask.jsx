@@ -8,10 +8,11 @@ import TaskForm from '../components/TaskForm';
 function AddTask() {
   const { token } = useContext(AuthContext);
   const navigate = useNavigate();
+  const baseUrl = process.env.REACT_APP_API_BASE_URL;
 
   const handleCreate = async (formData) => {
     try {
-      await axios.post('http://localhost:3000/api/tasks', formData, {
+      await axios.post(`${baseUrl}/api/tasks`, formData, {
         headers: { Authorization: `Bearer ${token}` },
       });
       navigate('/dashboard');

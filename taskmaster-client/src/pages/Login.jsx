@@ -9,6 +9,7 @@ function Login() {
     const navigate = useNavigate();
     const [form, setForm] = useState({email: '', password: ''});
     const [error, setError] = useState('');
+    const baseUrl = process.env.REACT_APP_API_BASE_URL;
 
     const handleChange = (e) => {
         setForm({ ...form, [e.target.name]: e.target.value });
@@ -17,7 +18,7 @@ function Login() {
     const handleSubmit = async (e) => {
         e.preventDefault();
         try{
-            const res = await axios.post('http://localhost:3000/api/login', form);
+            const res = await axios.post(`${baseUrl}/api/login`, form);
             login(res.data.token);
             navigate('/dashboard');
         }catch(err){
