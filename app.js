@@ -1,21 +1,32 @@
 require('dotenv').config();
-const cors = require('cors');
 const express = require('express');
-const requireAuth = require('./middleware/requireAuth');
+const cors = require('cors');
 const mongoose = require('mongoose');
 const methodOverride = require('method-override');
 const jwt = require('jsonwebtoken');
+
+const requireAuth = require('./middleware/requireAuth');
 const Task = require('./models/task');
 const User = require('./models/user');
-const PORT = process.env.PORT || 3000;
 
+const PORT = process.env.PORT || 3000;
 const app = express();
 
+// CORS config
 const allowedOrigins = ['https://task-master-auth.vercel.app'];
 app.use(cors({
-    origin: allowedOrigins,
-    credentials: true,
-  }));
+  origin: function (origin, callback) {
+    // Allow requests with no origin (e.g., mobile apps or curl)
+    if (!origin) return callback(null, true);
+    if (allowedOrigins.includes(origin)) {
+      return callback(null, true);
+    } else {
+      return callback(new Error('CORS not allowed from this origin'), false);
+    }
+  },
+  methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
+  credentials: true,
+}));
 
 if (process.env.NODE_ENV !== 'test') {
     mongoose.connect(process.env.MONGO_URI, {
