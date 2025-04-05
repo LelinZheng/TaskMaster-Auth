@@ -12,7 +12,10 @@ const User = require('./models/user');
 const PORT = process.env.PORT || 3000;
 const app = express();
 
-const allowedOrigins = ['https://task-master-auth.vercel.app'];
+const allowedOrigins =
+process.env.NODE_ENV === 'production'
+? ['https://task-master-auth.vercel.app']
+: ['http://localhost:3000', 'http://localhost:3001']; // for local running tests
 
 const corsOptions = {
   origin: function (origin, callback) {
@@ -25,8 +28,7 @@ const corsOptions = {
   methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
   credentials: true,
 };
-// dummy reploy trigger
-console.log("dummy reploy trigger");
+
 app.use(cors(corsOptions));
 app.options('*', cors(corsOptions));
 
