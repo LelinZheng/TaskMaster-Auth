@@ -1,3 +1,13 @@
+/**
+ * Dashboard Component
+ * Displays the user's tasks and provides functionality to:
+ * - Fetch tasks on load
+ * - Edit and delete tasks
+ * - Search and sort tasks
+ * - Show a spinner during loading
+ *
+ * Redirects to /login if user is not authenticated.
+ */
 import { useEffect, useState, useContext } from 'react';
 import axios from 'axios';
 import { AuthContext } from '../context/AuthContext';
@@ -10,6 +20,7 @@ import Spinner from '../components/Spinner';
 function Dashboard() {
     const { token, isLoggedIn } = useContext(AuthContext);
     const navigate = useNavigate();
+
     const [tasks, setTasks] = useState([]);
     const [error, setError] = useState('');
     const [loading, setLoading] = useState(true);
@@ -18,14 +29,17 @@ function Dashboard() {
     const [searchTerm, setSearchTerm] = useState('');
     const [sortBy, setSortBy] = useState('createdAt');
     const baseUrl = process.env.REACT_APP_API_BASE_URL;
-    
 
+    /**
+     * Fetch tasks on mount
+     * Redirects to login if user is not logged in
+     */
     useEffect(() => {
       if (!isLoggedIn) { // This check protects that route by redirecting to /login
         navigate('/login');
         return;
       }
-  
+
       const fetchTasks = async () => {
         setLoading(true);
         try {
@@ -46,6 +60,10 @@ function Dashboard() {
       fetchTasks();
     }, [baseUrl]);
 
+    /**
+     * Delete a task
+     * @param {string} taskId - ID of the task to delete
+     */
     const handleDelete = async (taskId) => {
         setDeletingTaskId(taskId);
         try {
@@ -60,10 +78,18 @@ function Dashboard() {
         }
     };
 
+    /**
+     * Begin editing a task
+     * @param {Object} task - The task to edit
+     */
     const handleEdit = (task) => {
         setEditingTask(task);
     };
-      
+
+    /**
+     * Update a task with new data
+     * @param {Object} taskData - New task data from the form
+     */
     const handleUpdate = async (taskData) => {
         try {
             const res = await axios.put(`${baseUrl}/api/tasks/${editingTask._id}`, taskData, {
@@ -76,11 +102,17 @@ function Dashboard() {
         }
     };
 
+    /**
+     * Filter tasks based on the search input
+     */
     const filteredTasks = tasks.filter(task =>
         task.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
         task.description.toLowerCase().includes(searchTerm.toLowerCase())
     );
-    
+
+    /**
+     * Sort the filtered tasks by selected criteria
+     */
     const sortedTasks = [...filteredTasks].sort((a, b) => {
         if (sortBy === 'priority') {
           const order = { High: 1, Medium: 2, Low: 3 };

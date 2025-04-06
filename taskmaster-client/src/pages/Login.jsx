@@ -1,3 +1,9 @@
+/**
+ * Login Component
+ * A form that allows existing users to log in using their email and password.
+ * On success, the received JWT token is stored via AuthContext and the user is
+ * redirected to the dashboard.
+ */
 import { useState, useContext } from 'react';
 import axios from 'axios';
 import { AuthContext } from '../context/AuthContext';
@@ -15,6 +21,11 @@ function Login() {
         setForm({ ...form, [e.target.name]: e.target.value });
     }
 
+    /**
+     * Handles form submission for login
+     * Sends form data to the backend, handles response and error
+     * @param {React.FormEvent<HTMLFormElement>} e
+     */
     const handleSubmit = async (e) => {
         e.preventDefault();
         try{

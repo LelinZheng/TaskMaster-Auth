@@ -1,3 +1,12 @@
+/**
+ * TaskList Component
+ *
+ * - Renders a list of tasks
+ * - Provides Edit and Delete buttons for each task
+ * - Highlights priority and status using Bootstrap badges
+ * - Shows a spinner when a task is being deleted
+ * - Displays a message if no tasks are found
+ */
 import { Link } from 'react-router-dom';
 
 function TaskList({ tasks, onEdit, onDelete, editingTaskId, deletingTaskId}) {

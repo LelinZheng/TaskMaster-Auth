@@ -1,3 +1,12 @@
+/**
+ * TaskForm component
+ * used for both creating and editing tasks.
+ *
+ * - Controlled form using useState for task data
+ * - Displays validation and submission error messages
+ * - Dynamically adapts between create and edit modes
+ * - Shows a loading spinner while submitting
+ */
 import { useState, useEffect } from 'react';
 
 function TaskForm({ token, onCreate, onUpdate, editingTask, cancelEdit }) {

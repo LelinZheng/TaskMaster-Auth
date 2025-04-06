@@ -1,3 +1,8 @@
+/**
+ * Task model definition
+ * Represents a task created by a user with details like title,
+ * description, priority, status, and timestamps.
+ */
 const mongoose = require('mongoose');
 const Schema = mongoose.Schema;
 

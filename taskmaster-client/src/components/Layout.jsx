@@ -1,3 +1,11 @@
+/**
+ * Layout component
+ * defines the common page structure (navbar + content + footer).
+ * - Uses AuthContext to determine whether a user is logged in
+ * - Shows navigation links based on auth state
+ * - Provides a logout button that clears auth token and redirects to login
+ * - Wraps around children content passed from each page (like Home, Dashboard, etc.)
+ */
 import { Link, useNavigate } from 'react-router-dom';
 import { useContext } from 'react';
 import { AuthContext } from '../context/AuthContext';
@@ -5,9 +13,13 @@ import { AuthContext } from '../context/AuthContext';
 function Layout({ children }) {
     const { isLoggedIn, logout } = useContext(AuthContext);
     const navigate = useNavigate();
+
+    /**
+     * Handles logout action: clears token and redirects to login.
+     */
     const handleLogout = () => {
-    logout();           // clears token
-    navigate('/login'); // force redirect after logout
+      logout();           // clears token
+      navigate('/login'); // force redirect after logout
     };
     return (
         <div className="d-flex flex-column min-vh-100">

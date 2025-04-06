@@ -1,3 +1,8 @@
+/**
+ * User model definition
+ * Represents a registered user with a unique username and email.
+ * The password is hashed before saving.
+ */
 const mongoose = require('mongoose');
 const bcrypt = require('bcryptjs');
 
@@ -8,14 +13,20 @@ const UserSchema = new mongoose.Schema({
 });
 
 
-// Hash password
+/**
+ * Hash the password before saving to the database.
+ */
 UserSchema.pre('save', async function(next) {
     if (!this.isModified('password')) return next();
     this.password = await bcrypt.hash(this.password, 12);
     next();
 });
 
-// Compare password method
+/**
+ * Compare an incoming plain text password with the hashed one.
+ * @param {string} candidatePassword - Plain text password to compare.
+ * @returns {Promise<boolean>} True if passwords match, else false.
+ */
 UserSchema.methods.comparePassword = async function(candidatePassword) {
     return await bcrypt.compare(candidatePassword, this.password);
   };

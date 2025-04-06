@@ -1,4 +1,6 @@
+// Load environment variables from .env file
 require('dotenv').config();
+
 const express = require('express');
 const cors = require('cors');
 const mongoose = require('mongoose');
@@ -9,14 +11,22 @@ const requireAuth = require('./middleware/requireAuth');
 const Task = require('./models/task');
 const User = require('./models/user');
 
-const PORT = process.env.PORT || 3000;
+const PORT = process.env.PORT || 3000; //default to 3000 for local
 const app = express();
 
+/**
+ * Allowed origins for CORS, based on environment (on Cloud or locally)
+ * @type {string[]}
+ */
 const allowedOrigins =
 process.env.NODE_ENV === 'production'
 ? ['https://task-master-auth.vercel.app']
-: ['http://localhost:3000', 'http://localhost:3001']; // for local running tests
+: ['http://localhost:3000', 'http://localhost:3001'];
 
+/**
+ * CORS middleware options
+ * @type {{credentials: boolean, methods: string[], origin: corsOptions.origin}}
+ */
 const corsOptions = {
   origin: function (origin, callback) {
     if (!origin || allowedOrigins.includes(origin)) {
@@ -25,18 +35,14 @@ const corsOptions = {
       callback(new Error('Not allowed by CORS'));
     }
   },
-  methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
+  methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'], // Allowed HTTP methods
   credentials: true,
 };
 
 app.use(cors(corsOptions));
 app.options('*', cors(corsOptions));
 
-app.get('/cors-check', (req, res) => {
-    res.set('Access-Control-Allow-Origin', '*');
-    res.json({ message: 'CORS check route reached!' });
-  });
-
+// To avoid testing changing the actual database
 if (process.env.NODE_ENV !== 'test') {
     mongoose.connect(process.env.MONGO_URI, {
       useNewUrlParser: true,
@@ -116,7 +122,7 @@ app.post('/api/register', async (req, res) => {
         res.status(201).json({ token });
     
     } catch (err) {
-        if (err.code === 11000) {
+        if (err.code === 11000) { // MongoDB duplicate key error
           const field = Object.keys(err.keyValue)[0];
           const value = err.keyValue[field];
           return res.status(400).json({ error: `${field.charAt(0).toUpperCase() + field.slice(1)} "${value}" is already taken.` });
@@ -153,10 +159,8 @@ app._router.stack.forEach(r => {
   }
 });
 
-
 app.listen(PORT, () => {
     console.log(`Serving on port ${PORT}`);
 });
 
-  
 module.exports = app;

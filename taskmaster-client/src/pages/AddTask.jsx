@@ -1,3 +1,11 @@
+/**
+ * AddTask component
+ * handles creation of a new task.
+ * - Uses AuthContext to get the logged-in user's JWT token
+ * - Sends a POST request to the backend to create a task
+ * - Redirects the user back to the dashboard after successful creation
+ * - Renders the TaskForm component in create mode
+ */
 import { useContext } from 'react';
 import { AuthContext } from '../context/AuthContext';
 import { useNavigate } from 'react-router-dom';
@@ -10,6 +18,10 @@ function AddTask() {
   const navigate = useNavigate();
   const baseUrl = process.env.REACT_APP_API_BASE_URL;
 
+  /**
+   * Submits a new task to the backend.
+   * @param {Object} formData - Task data submitted from the form
+   */
   const handleCreate = async (formData) => {
     try {
       await axios.post(`${baseUrl}/api/tasks`, formData, {

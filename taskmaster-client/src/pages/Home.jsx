@@ -1,3 +1,8 @@
+/**
+ * Home Component
+ * Displays a welcoming landing page for TaskMaster.
+ * Includes a headline, motivational text, and an illustration.
+ */
 import Layout from '../components/Layout';
 
 function Home() {
